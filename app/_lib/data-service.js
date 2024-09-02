@@ -1,5 +1,5 @@
 import { eachDayOfInterval } from 'date-fns';
-
+import { supabase } from './supabase';
 /////////////
 // GET
 
@@ -37,7 +37,9 @@ export async function getCabinPrice(id) {
 export const getCabins = async function () {
   const { data, error } = await supabase
     .from('cabins')
-    .select('id, name, maxCapacity, regularPrice, discount, image')
+    .select(
+      'id, name, maxCapacity, regularPrice, discount, image'
+    )
     .order('name');
 
   if (error) {
@@ -69,7 +71,9 @@ export async function getBooking(id) {
 
   if (error) {
     console.error(error);
-    throw new Error('Booking could not get loaded');
+    throw new Error(
+      'Booking could not get loaded'
+    );
   }
 
   return data;
@@ -87,13 +91,17 @@ export async function getBookings(guestId) {
 
   if (error) {
     console.error(error);
-    throw new Error('Bookings could not get loaded');
+    throw new Error(
+      'Bookings could not get loaded'
+    );
   }
 
   return data;
 }
 
-export async function getBookedDatesByCabinId(cabinId) {
+export async function getBookedDatesByCabinId(
+  cabinId
+) {
   let today = new Date();
   today.setUTCHours(0, 0, 0, 0);
   today = today.toISOString();
@@ -103,11 +111,15 @@ export async function getBookedDatesByCabinId(cabinId) {
     .from('bookings')
     .select('*')
     .eq('cabinId', cabinId)
-    .or(`startDate.gte.${today},status.eq.checked-in`);
+    .or(
+      `startDate.gte.${today},status.eq.checked-in`
+    );
 
   if (error) {
     console.error(error);
-    throw new Error('Bookings could not get loaded');
+    throw new Error(
+      'Bookings could not get loaded'
+    );
   }
 
   // Converting to actual dates to be displayed in the date picker
@@ -124,11 +136,16 @@ export async function getBookedDatesByCabinId(cabinId) {
 }
 
 export async function getSettings() {
-  const { data, error } = await supabase.from('settings').select('*').single();
+  const { data, error } = await supabase
+    .from('settings')
+    .select('*')
+    .single();
 
   if (error) {
     console.error(error);
-    throw new Error('Settings could not be loaded');
+    throw new Error(
+      'Settings could not be loaded'
+    );
   }
 
   return data;
@@ -150,7 +167,9 @@ export async function getCountries() {
 // CREATE
 
 export async function createGuest(newGuest) {
-  const { data, error } = await supabase.from('guests').insert([newGuest]);
+  const { data, error } = await supabase
+    .from('guests')
+    .insert([newGuest]);
 
   if (error) {
     console.error(error);
@@ -170,7 +189,9 @@ export async function createBooking(newBooking) {
 
   if (error) {
     console.error(error);
-    throw new Error('Booking could not be created');
+    throw new Error(
+      'Booking could not be created'
+    );
   }
 
   return data;
@@ -180,7 +201,10 @@ export async function createBooking(newBooking) {
 // UPDATE
 
 // The updatedFields is an object which should ONLY contain the updated data
-export async function updateGuest(id, updatedFields) {
+export async function updateGuest(
+  id,
+  updatedFields
+) {
   const { data, error } = await supabase
     .from('guests')
     .update(updatedFields)
@@ -195,7 +219,10 @@ export async function updateGuest(id, updatedFields) {
   return data;
 }
 
-export async function updateBooking(id, updatedFields) {
+export async function updateBooking(
+  id,
+  updatedFields
+) {
   const { data, error } = await supabase
     .from('bookings')
     .update(updatedFields)
@@ -205,7 +232,9 @@ export async function updateBooking(id, updatedFields) {
 
   if (error) {
     console.error(error);
-    throw new Error('Booking could not be updated');
+    throw new Error(
+      'Booking could not be updated'
+    );
   }
   return data;
 }
@@ -214,11 +243,16 @@ export async function updateBooking(id, updatedFields) {
 // DELETE
 
 export async function deleteBooking(id) {
-  const { data, error } = await supabase.from('bookings').delete().eq('id', id);
+  const { data, error } = await supabase
+    .from('bookings')
+    .delete()
+    .eq('id', id);
 
   if (error) {
     console.error(error);
-    throw new Error('Booking could not be deleted');
+    throw new Error(
+      'Booking could not be deleted'
+    );
   }
   return data;
 }
