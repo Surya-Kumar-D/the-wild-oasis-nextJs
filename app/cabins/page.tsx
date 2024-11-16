@@ -1,8 +1,29 @@
 import CabinCard from '@/app/_components/CabinCard';
+import { getCabins } from '../_lib/data-service';
+import { z } from 'zod';
 
-export default function Page() {
+const cabinsSchema = z.array(
+  z.object({
+    id: z.number(),
+    name: z.string(),
+    maxCapacity: z.number(),
+    regularPrice: z.number(),
+    discount: z.number(),
+    image: z.string().url(),
+  })
+);
+
+export type Cabins = z.infer<typeof cabinsSchema>;
+
+export default async function Page() {
   // CHANGE
   const cabins = [];
+  const rawCabins = await getCabins();
+  const validateCabins =
+    cabinsSchema.safeParse(rawCabins);
+  if (!validateCabins.success) {
+    console.error(validateCabins.error);
+  }
 
   return (
     <div>
@@ -22,9 +43,9 @@ export default function Page() {
         Welcome to paradise.
       </p>
 
-      {cabins.length > 0 && (
+      {validateCabins.data.length > 0 && (
         <div className="grid gap-8 sm:grid-cols-1 md:grid-cols-2 lg:gap-12 xl:gap-14">
-          {cabins.map((cabin) => (
+          {validateCabins.data.map((cabin) => (
             <CabinCard
               cabin={cabin}
               key={cabin.id}

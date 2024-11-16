@@ -25,7 +25,8 @@
     "next-env.d.ts",
     ".next/types/**/*.ts",
     "**/*.ts",
-    "**/*.tsx"
+    "**/*.tsx",
+    "app/_lib/supabase.js"
   ],
   "exclude": ["node_modules"]
 }
