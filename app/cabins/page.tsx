@@ -1,29 +1,25 @@
 import CabinCard from '@/app/_components/CabinCard';
 import { getCabins } from '../_lib/data-service';
 import { z } from 'zod';
+import CabinList from '../_components/CabinList';
+import { Suspense } from 'react';
+import Spinner from '../_components/Spinner';
 
-const cabinsSchema = z.array(
-  z.object({
-    id: z.number(),
-    name: z.string(),
-    maxCapacity: z.number(),
-    regularPrice: z.number(),
-    discount: z.number(),
-    image: z.string().url(),
-  })
-);
-
+export const cabinSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  maxCapacity: z.number(),
+  regularPrice: z.number(),
+  discount: z.number(),
+  description: z.string().optional(),
+  image: z.string().url(),
+});
+export const cabinsSchema = z.array(cabinSchema);
+export type Cabin = z.infer<typeof cabinSchema>;
 export type Cabins = z.infer<typeof cabinsSchema>;
 
-export default async function Page() {
+export default function Page() {
   // CHANGE
-  const cabins = [];
-  const rawCabins = await getCabins();
-  const validateCabins =
-    cabinsSchema.safeParse(rawCabins);
-  if (!validateCabins.success) {
-    console.error(validateCabins.error);
-  }
 
   return (
     <div>
@@ -43,16 +39,9 @@ export default async function Page() {
         Welcome to paradise.
       </p>
 
-      {validateCabins.data.length > 0 && (
-        <div className="grid gap-8 sm:grid-cols-1 md:grid-cols-2 lg:gap-12 xl:gap-14">
-          {validateCabins.data.map((cabin) => (
-            <CabinCard
-              cabin={cabin}
-              key={cabin.id}
-            />
-          ))}
-        </div>
-      )}
+      <Suspense fallback={<Spinner />}>
+        <CabinList />
+      </Suspense>
     </div>
   );
 }
