@@ -7,6 +7,7 @@ import {
   parseISO,
 } from 'date-fns';
 import DeleteReservation from '../../starter/components/DeleteReservation';
+import Image from 'next/image';
 
 export const formatDistanceFromNow = (dateStr) =>
   formatDistance(parseISO(dateStr), new Date(), {
@@ -29,8 +30,9 @@ function ReservationCard({ booking }) {
 
   return (
     <div className="flex border border-primary-800">
-      <div className="relative h-32 aspect-square">
-        <img
+      <div className="relative h-32 aspect-square ">
+        <Image
+          fill
           src={image}
           alt={`Cabin ${name}`}
           className="object-cover border-r border-primary-800"

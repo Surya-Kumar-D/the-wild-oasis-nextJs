@@ -4,6 +4,13 @@ import { z } from 'zod';
 import CabinList from '../_components/CabinList';
 import { Suspense } from 'react';
 import Spinner from '../_components/Spinner';
+import { Metadata } from 'next';
+
+// export const revalidate = 3600;
+
+export const metadata: Metadata = {
+  title: 'Cabins',
+};
 
 export const cabinSchema = z.object({
   id: z.number(),
