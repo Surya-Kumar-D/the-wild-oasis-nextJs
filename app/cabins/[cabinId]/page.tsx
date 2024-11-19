@@ -9,6 +9,7 @@ import {
 } from '@heroicons/react/24/solid';
 import Image from 'next/image';
 import { type Cabin } from '../page';
+import TextExpander from '@/app/_components/TextExpander';
 
 // export const metadata: Metadata = {
 //   title: 'Cabin',
@@ -70,7 +71,9 @@ export default async function Page({
           </h3>
 
           <p className="mb-10 text-lg text-primary-300">
-            {description}
+            <TextExpander>
+              {description}
+            </TextExpander>
           </p>
 
           <ul className="flex flex-col gap-4 mb-7">
