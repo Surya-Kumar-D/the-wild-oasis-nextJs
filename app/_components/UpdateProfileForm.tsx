@@ -21,7 +21,7 @@ function UpdateProfileForm({ children }) {
       </div>
 
       <div className="space-y-2">
-        <div className="flex items-center justify-between ">
+        <div className="relative flex items-center justify-between ">
           <label htmlFor="nationality">
             Where are you from?
           </label>

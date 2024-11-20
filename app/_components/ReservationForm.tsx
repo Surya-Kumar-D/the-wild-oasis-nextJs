@@ -7,7 +7,7 @@ function ReservationForm({
   user,
 }: {
   cabin: Cabin;
-  user: { image: string; name: string };
+  user?: {};
 }) {
   const { range } = useReservation();
 
@@ -23,10 +23,10 @@ function ReservationForm({
             // Important to display google profile images
             referrerPolicy="no-referrer"
             className="h-8 rounded-full"
-            src={user.image}
-            alt={user.name}
+            src={user?.image}
+            alt={user?.name}
           />
-          <p>{user.name}</p>
+          <p>{user?.name}</p>
         </div>
       </div>
 
