@@ -7,6 +7,8 @@ import {
 } from '@/app/_lib/auth';
 import { supabase } from './supabase';
 import { revalidatePath } from 'next/cache';
+import { getBookings } from './data-service';
+import toast from 'react-hot-toast';
 
 export async function SignInAction() {
   return await signIn('google', {
@@ -20,7 +22,7 @@ export async function SignOutAction() {
 
 export async function updateGuest(formData) {
   const session = await auth();
-  console.log(session);
+
   const nationalID = formData.get('nationalID');
   if (!session.user)
     throw new Error('You must be logged in');
@@ -46,5 +48,45 @@ export async function updateGuest(formData) {
   if (error) {
     console.error(error);
     throw new Error('Guest could not be updated');
+  }
+}
+
+export async function deleteReservation(
+  bookingId
+) {
+  console.log(bookingId);
+  const session = await auth();
+  if (!session.user)
+    throw new Error('You must be logged in');
+
+  const bookings = await getBookings(
+    session?.user?.guestId
+  );
+  const bookingIds = bookings.map(
+    (booking) => booking.id
+  );
+  console.log(
+    bookingIds.includes(bookingId),
+    bookingId
+  );
+
+  if (!bookingIds.includes(bookingId)) {
+    throw new Error(
+      'You are not allowed to delete this reservation'
+    );
+  }
+
+  const { data, error } = await supabase
+    .from('bookings')
+    .delete()
+    .eq('id', bookingId);
+
+  revalidatePath('/account/reservations');
+
+  if (error) {
+    console.error(error);
+    throw new Error(
+      'Booking could not be deleted'
+    );
   }
 }
