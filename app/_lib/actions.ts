@@ -5,10 +5,10 @@ import {
   signIn,
   signOut,
 } from '@/app/_lib/auth';
-import { supabase } from './supabase';
 import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
 import { getBookings } from './data-service';
-import toast from 'react-hot-toast';
+import { supabase } from './supabase';
 
 export async function SignInAction() {
   return await signIn('google', {
@@ -54,7 +54,6 @@ export async function updateGuest(formData) {
 export async function deleteReservation(
   bookingId
 ) {
-  console.log(bookingId);
   const session = await auth();
   if (!session.user)
     throw new Error('You must be logged in');
@@ -64,10 +63,6 @@ export async function deleteReservation(
   );
   const bookingIds = bookings.map(
     (booking) => booking.id
-  );
-  console.log(
-    bookingIds.includes(bookingId),
-    bookingId
   );
 
   if (!bookingIds.includes(bookingId)) {
@@ -89,4 +84,61 @@ export async function deleteReservation(
       'Booking could not be deleted'
     );
   }
+}
+
+export async function updateReservation(
+  formData
+) {
+  const session = await auth();
+
+  if (!session.user)
+    throw new Error('You must be logged in');
+  console.log(formData);
+  const bookingId = Number(
+    formData.get('bookingId')
+  );
+  const numGuests = Number(
+    formData.get('numGuests')
+  );
+  const observations = formData
+    .get('observations')
+    .slice(0, 1000);
+  const bookings = await getBookings(
+    session?.user?.guestId
+  );
+  const bookingIds = bookings.map(
+    (booking) => booking.id
+  );
+
+  if (!bookingIds.includes(bookingId)) {
+    throw new Error(
+      'You are not allowed to delete this reservation'
+    );
+  }
+
+  const updateData = {
+    numGuests,
+    observations,
+  };
+
+  const { data, error } = await supabase
+    .from('bookings')
+    .update(updateData)
+    .eq('id', bookingId)
+    .select()
+    .single();
+
+  if (error) {
+    console.error(error);
+    throw new Error(
+      'Booking could not be updated'
+    );
+  }
+  revalidatePath('/account/reservations');
+
+  revalidatePath(
+    `/account/reservations/edit/${bookingId}`
+  );
+
+  redirect('/account/reservations');
 }

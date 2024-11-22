@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { auth } from '../_lib/auth';
 import {
   getBookedDatesByCabinId,
@@ -6,6 +7,7 @@ import {
 import DateSelector from './DateSelector';
 import LoginMessage from './LoginMessage';
 import ReservationForm from './ReservationForm';
+import Loading from '../cabins/loading';
 
 async function Reservation({ cabin }) {
   const [settings, bookedDates] =
@@ -16,11 +18,14 @@ async function Reservation({ cabin }) {
   const session = await auth();
   return (
     <div className="grid grid-cols-2 border border-primary-800 min-h-[400px]">
-      <DateSelector
-        settings={settings}
-        cabin={cabin}
-        bookedDates={bookedDates}
-      />
+      <Suspense fallback={<Loading />}>
+        <DateSelector
+          settings={settings}
+          cabin={cabin}
+          bookedDates={bookedDates}
+        />
+      </Suspense>
+
       {session?.user ? (
         <ReservationForm
           cabin={cabin}

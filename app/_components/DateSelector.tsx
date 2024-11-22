@@ -1,13 +1,18 @@
 'use client';
-import { isWithinInterval } from 'date-fns';
+import {
+  differenceInDays,
+  isPast,
+  isSameDay,
+  isWithinInterval,
+} from 'date-fns';
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
 import { useReservation } from './ReservationContext';
 
 function isAlreadyBooked(range, datesArr) {
   return (
-    range.from &&
-    range.to &&
+    range?.from &&
+    range?.to &&
     datesArr.some((date) =>
       isWithinInterval(date, {
         start: range.from,
@@ -23,16 +28,30 @@ function DateSelector({
   cabin,
 }) {
   // CHANGE
-  const regularPrice = 23;
-  const discount = 23;
-  const numNights = 23;
-  const cabinPrice = 23;
+  const { regularPrice, discount } = cabin;
   const { range, setRange, resetRange } =
     useReservation();
+  const displayRange = isAlreadyBooked(
+    range,
+    bookedDates
+  )
+    ? {}
+    : range;
+  const numNights = differenceInDays(
+    displayRange?.to,
+    displayRange?.from
+  );
 
+  const cabinPrice =
+    regularPrice * (numNights - discount);
+  console.log(
+    bookedDates.some((date) =>
+      isSameDay(date, new Date())
+    )
+  );
   // SETTINGS
   const { minBookingLength, maxBookingLength } =
-    bookedDates;
+    settings;
   return (
     <div className="flex flex-col justify-between">
       <DayPicker
@@ -44,9 +63,15 @@ function DateSelector({
         fromDate={new Date()}
         toYear={new Date().getFullYear() + 5}
         onSelect={setRange}
-        selected={range}
+        selected={displayRange}
         captionLayout="dropdown"
         numberOfMonths={2}
+        disabled={(curDate) =>
+          isPast(curDate) ||
+          bookedDates.some((date) =>
+            isSameDay(date, curDate)
+          )
+        }
       />
 
       <div className="flex items-center justify-between px-8 bg-accent-500 text-primary-800 h-[72px]">
@@ -71,13 +96,13 @@ function DateSelector({
           {numNights ? (
             <>
               <p className="px-3 py-2 text-2xl bg-accent-600">
-                <span>&times;</span>{' '}
+                <span>&times;</span>
                 <span>{numNights}</span>
               </p>
               <p>
                 <span className="text-lg font-bold uppercase">
                   Total
-                </span>{' '}
+                </span>
                 <span className="text-2xl font-semibold">
                   ${cabinPrice}
                 </span>
@@ -86,7 +111,7 @@ function DateSelector({
           ) : null}
         </div>
 
-        {range.from || range.to ? (
+        {range?.from || range?.to ? (
           <button
             className="px-4 py-2 text-sm font-semibold border border-primary-800"
             onClick={resetRange}
